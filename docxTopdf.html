@@ -7,6 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   :root {
     --bg: #f4f6fa;
@@ -116,7 +117,7 @@
   .warning-box.active { display: block; }
   .warning-box strong { color: var(--warning); }
 
-  /* Styles de contenu PDF - fidèles à Word */
+  /* ============ STYLES DE CONTENU PDF ============ */
   .pdf-content {
     font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
     font-size: 11pt; line-height: 1.5; color: #000; background: #fff;
@@ -140,15 +141,95 @@
   .pdf-content .text-inverse { background: #000; color: #fff; padding: 2pt 6pt; }
   .pdf-content .paragraph-right { text-align: right; border-right: 3pt solid #ccc; background: #f0f0f0; padding: 8pt; margin: 9pt 0; }
   .pdf-content .paragraph-hanging { text-indent: -20pt; padding-left: 20pt; margin-top: 12pt; }
-  .pdf-content table { border-collapse: collapse; width: 100%; margin: 12pt 0; }
-  .pdf-content table th, .pdf-content table td { border: 1pt solid #000; padding: 4pt 8pt; text-align: left; }
-  .pdf-content table th { background: #d9e2f3; font-weight: bold; }
   .pdf-content ul, .pdf-content ol { margin: 9pt 0; padding-left: 30pt; }
   .pdf-content li { margin: 3pt 0; }
   .pdf-content img { max-width: 100%; height: auto; }
   .pdf-content a { color: #0563c1; text-decoration: underline; }
 
-  /* Conteneur de capture PDF - hauteur fixe A4 */
+  /* ============ TABLEAUX - STYLES COMPLETS ============ */
+  .pdf-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12pt 0;
+    font-size: 10pt;
+    table-layout: auto;
+  }
+  .pdf-content table td,
+  .pdf-content table th {
+    border: 1pt solid #000000;
+    padding: 4pt 6pt;
+    text-align: left;
+    vertical-align: middle;
+    word-wrap: break-word;
+  }
+  .pdf-content table th {
+    background: #d9e2f3;
+    font-weight: bold;
+    color: #000;
+  }
+  /* Alternance de couleurs pour les lignes */
+  .pdf-content table tbody tr:nth-child(even) {
+    background: #f2f2f2;
+  }
+  .pdf-content table tbody tr:nth-child(odd) {
+    background: #ffffff;
+  }
+  /* Première ligne en gras si pas de th */
+  .pdf-content table tbody tr:first-child td {
+    font-weight: bold;
+    background: #e8edf5;
+  }
+  /* Tableaux flottants à gauche/droite */
+  .pdf-content table.float-left {
+    float: left;
+    margin-right: 12pt;
+    width: auto;
+  }
+  .pdf-content table.float-right {
+    float: right;
+    margin-left: 12pt;
+    width: auto;
+  }
+  /* Tableaux centrés */
+  .pdf-content table.centered {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  /* Cellules fusionnées - style spécial */
+  .pdf-content table td[colspan],
+  .pdf-content table td[rowspan],
+  .pdf-content table th[colspan],
+  .pdf-content table th[rowspan] {
+    background: #f8f9fa;
+  }
+  /* Tableaux avec bordures colorées */
+  .pdf-content table.border-green td,
+  .pdf-content table.border-green th {
+    border-color: #008000;
+  }
+  .pdf-content table.border-blue td,
+  .pdf-content table.border-blue th {
+    border-color: #0000ff;
+  }
+  .pdf-content table.border-red td,
+  .pdf-content table.border-red th {
+    border-color: #ff0000;
+  }
+  /* Cellules vides - garder une hauteur minimale */
+  .pdf-content table td:empty::after,
+  .pdf-content table th:empty::after {
+    content: "\00a0";
+  }
+  /* Calendriers et tableaux larges */
+  .pdf-content table.wide {
+    font-size: 9pt;
+  }
+  .pdf-content table.wide td,
+  .pdf-content table.wide th {
+    padding: 2pt 4pt;
+  }
+
+  /* ============ CAPTURE PDF ============ */
   .pdf-page-capture {
     width: 794px;
     min-height: 1123px;
@@ -159,6 +240,15 @@
     font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
     font-size: 11pt;
     line-height: 1.5;
+  }
+  .pdf-page-capture table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  .pdf-page-capture table td,
+  .pdf-page-capture table th {
+    border: 1pt solid #000000;
+    padding: 4pt 6pt;
   }
 </style>
 </head>
@@ -256,7 +346,7 @@ function hideProgress() { progressWrap.classList.remove('active'); }
 libreofficeCheck.addEventListener('change', () => {
   if (libreofficeCheck.checked) {
     warningBox.classList.add('active');
-    modeIndicator.textContent = '🖥️ Mode LibreOffice';
+    modeIndicator.textContent = '️ Mode LibreOffice';
     modeIndicator.className = 'mode-indicator mode-libreoffice';
     showStatus('ℹ️ Mode LibreOffice activé - Fallback automatique si serveur indisponible', 'warning');
   } else {
@@ -281,6 +371,119 @@ fileInput.addEventListener('change', e => {
   if (e.target.files[0]) handleFile(e.target.files[0]);
 });
 
+// Extraire les styles inline du DOCX
+async function extractInlineStyles(file) {
+  const styles = new Map();
+  try {
+    const zip = await JSZip.loadAsync(file);
+    const documentXml = await zip.file('word/document.xml').async('string');
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(documentXml, 'application/xml');
+    const runs = xmlDoc.getElementsByTagName('w:r');
+    let runIndex = 0;
+    for (const run of runs) {
+      const rPr = run.getElementsByTagName('w:rPr')[0];
+      if (rPr) {
+        const styleInfo = {};
+        const color = rPr.getElementsByTagName('w:color')[0];
+        if (color) styleInfo.color = '#' + color.getAttribute('w:val');
+        const highlight = rPr.getElementsByTagName('w:highlight')[0];
+        if (highlight) styleInfo.highlight = highlight.getAttribute('w:val');
+        const border = rPr.getElementsByTagName('w:bdr')[0];
+        if (border) styleInfo.border = true;
+        const strike = rPr.getElementsByTagName('w:strike')[0];
+        if (strike && strike.getAttribute('w:val') !== '0') styleInfo.strike = true;
+        if (Object.keys(styleInfo).length > 0) styles.set(runIndex, styleInfo);
+      }
+      runIndex++;
+    }
+  } catch (err) {
+    console.warn('Erreur extraction styles:', err);
+  }
+  return styles;
+}
+
+// Appliquer les styles inline au HTML
+function applyInlineStyles(html, styles) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  const elements = doc.body.querySelectorAll('p, span, strong, em, b, i, u, s');
+  let elementIndex = 0;
+  for (const el of elements) {
+    const styleInfo = styles.get(elementIndex);
+    if (styleInfo) {
+      if (styleInfo.color && styleInfo.color !== '#000000') el.style.color = styleInfo.color;
+      if (styleInfo.highlight) {
+        const highlightColors = {
+          yellow: '#FFFF00', green: '#00FF00', blue: '#00FFFF', red: '#FF0000',
+          magenta: '#FF00FF', cyan: '#00FFFF', white: '#FFFFFF', darkBlue: '#00008B',
+          darkCyan: '#008B8B', darkGreen: '#006400', darkMagenta: '#8B008B',
+          darkRed: '#8B0000', darkYellow: '#808000', darkGray: '#A9A9A9',
+          lightGray: '#D3D3D3', black: '#000000'
+        };
+        el.style.backgroundColor = highlightColors[styleInfo.highlight] || styleInfo.highlight;
+        el.style.padding = '2pt 4pt';
+      }
+      if (styleInfo.border) {
+        el.style.border = '1pt solid #000';
+        el.style.padding = '4pt 8pt';
+        el.style.display = 'inline-block';
+      }
+      if (styleInfo.strike) el.style.textDecoration = 'line-through';
+    }
+    elementIndex++;
+  }
+  return doc.body.innerHTML;
+}
+
+// Améliorer les tableaux : forcer les bordures et la structure
+function enhanceTables(html) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  const tables = doc.querySelectorAll('table');
+  
+  tables.forEach((table, tableIndex) => {
+    // Forcer border-collapse
+    table.style.borderCollapse = 'collapse';
+    table.style.width = '100%';
+    table.style.margin = '12pt 0';
+    
+    const rows = table.querySelectorAll('tr');
+    rows.forEach((row, rowIndex) => {
+      const cells = row.querySelectorAll('td, th');
+      cells.forEach((cell, cellIndex) => {
+        // Forcer les bordures sur chaque cellule
+        cell.style.border = '1pt solid #000000';
+        cell.style.padding = '4pt 6pt';
+        cell.style.verticalAlign = 'middle';
+        
+        // Première ligne = en-tête
+        if (rowIndex === 0) {
+          cell.style.fontWeight = 'bold';
+          cell.style.background = '#d9e2f3';
+          if (cell.tagName === 'TD') {
+            cell.tagName = 'TH';
+          }
+        }
+        // Alternance de couleurs
+        else if (rowIndex % 2 === 0) {
+          cell.style.background = '#f2f2f2';
+        }
+        else {
+          cell.style.background = '#ffffff';
+        }
+        
+        // Cellules vides : ajouter un espace insécable
+        if (cell.textContent.trim() === '') {
+          cell.innerHTML = '&nbsp;';
+        }
+      });
+    });
+  });
+  
+  return doc.body.innerHTML;
+}
+
 async function handleFile(file) {
   hideStatus();
   if (!file.name.toLowerCase().endsWith('.docx')) {
@@ -294,7 +497,10 @@ async function handleFile(file) {
   setProgress(10, 'Lecture du fichier…');
   try {
     const arrayBuffer = await file.arrayBuffer();
-    setProgress(40, 'Conversion en HTML…');
+    setProgress(30, 'Extraction des styles inline…');
+    const inlineStyles = await extractInlineStyles(file);
+    
+    setProgress(50, 'Conversion en HTML…');
     const result = await mammoth.convertToHtml(
       { arrayBuffer },
       {
@@ -305,12 +511,18 @@ async function handleFile(file) {
         })
       }
     );
-    currentHtml = result.value;
+    
+    // Appliquer les styles inline ET améliorer les tableaux
+    let enhancedHtml = applyInlineStyles(result.value, inlineStyles);
+    enhancedHtml = enhanceTables(enhancedHtml);
+    
+    currentHtml = enhancedHtml;
     preview.innerHTML = '<div class="pdf-content">' + currentHtml + '</div>';
+    
     setProgress(100, 'Prévisualisation prête ✓');
     setTimeout(hideProgress, 800);
     toolbar.style.display = 'flex';
-    showStatus('✅ Fichier chargé et prévisualisé', 'success');
+    showStatus('✅ Fichier chargé avec styles et tableaux', 'success');
   } catch (err) {
     console.error(err);
     hideProgress();
@@ -318,7 +530,6 @@ async function handleFile(file) {
   }
 }
 
-// Découpe le HTML en pages A4 (794x1123px)
 function splitIntoPages(htmlContent) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(htmlContent, 'text/html');
@@ -328,10 +539,9 @@ function splitIntoPages(htmlContent) {
   let currentPage = document.createElement('div');
   currentPage.className = 'pdf-page-capture';
   let currentHeight = 0;
-  const maxHeight = 973; // 1123 - 150 (padding)
+  const maxHeight = 973;
 
   for (const child of children) {
-    // Mesurer la hauteur réelle de l'élément
     const tempDiv = document.createElement('div');
     tempDiv.style.cssText = 'position:absolute;visibility:hidden;width:644px;top:-9999px;left:-9999px;';
     tempDiv.appendChild(child.cloneNode(true));
@@ -407,26 +617,21 @@ async function convertLocally() {
 
 async function convertWithLibreOffice(file) {
   setProgress(0, 'Tentative de connexion au serveur LibreOffice…');
-
   const formData = new FormData();
   formData.append('file', file);
 
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
-
     const response = await fetch(LIBREOFFICE_SERVER + '/convert', {
       method: 'POST',
       body: formData,
       signal: controller.signal
     });
-
     clearTimeout(timeoutId);
-
     if (!response.ok) throw new Error('Erreur serveur: ' + response.status);
 
     setProgress(50, 'Conversion en cours sur le serveur…');
-
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -436,7 +641,6 @@ async function convertWithLibreOffice(file) {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
-
     return true;
   } catch (err) {
     console.warn('Serveur LibreOffice indisponible:', err);
@@ -446,17 +650,15 @@ async function convertWithLibreOffice(file) {
 
 downloadBtn.addEventListener('click', async () => {
   downloadBtn.disabled = true;
-
   try {
     if (libreofficeCheck.checked) {
       const success = await convertWithLibreOffice(currentFile);
-
       if (success) {
         setProgress(100, 'PDF généré avec LibreOffice ✓');
         setTimeout(hideProgress, 1000);
         showStatus('✅ PDF téléchargé via LibreOffice : ' + currentName + '.pdf', 'success');
       } else {
-        showStatus('️ Serveur LibreOffice indisponible, bascule en mode local…', 'warning');
+        showStatus('⚠️ Serveur LibreOffice indisponible, bascule en mode local…', 'warning');
         setProgress(0, 'Conversion en mode local…');
         const pdf = await convertLocally();
         setProgress(95, 'Sauvegarde…');
