@@ -18,6 +18,7 @@
     --border: #e5e7eb;
     --success: #10b981;
     --danger: #ef4444;
+    --warning: #f59e0b;
     --radius: 12px;
   }
   @media (prefers-color-scheme: dark) {
@@ -32,26 +33,17 @@
     }
   }
   * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
   body {
-    margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
     padding: 24px;
   }
-  .container {
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  h1 {
-    margin: 0 0 8px;
-    font-size: 1.8rem;
-  }
-  .subtitle {
-    color: var(--muted);
-    margin-bottom: 24px;
-  }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { margin: 0 0 8px; font-size: 1.8rem; }
+  .subtitle { color: var(--muted); margin-bottom: 24px; }
   .dropzone {
     background: var(--card);
     border: 2px dashed var(--border);
@@ -69,138 +61,111 @@
     border-color: var(--primary);
     background: color-mix(in srgb, var(--primary) 5%, var(--card));
   }
-  .dropzone svg {
-    width: 48px;
-    height: 48px;
-    color: var(--muted);
-    margin-bottom: 12px;
-    display: block;
-  }
+  .dropzone svg { width: 48px; height: 48px; color: var(--muted); margin-bottom: 12px; display: block; }
   .dropzone p { margin: 4px 0; }
   .dropzone .hint { color: var(--muted); font-size: .9rem; }
   #fileInput { display: none; }
-
   .toolbar {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
-    margin: 20px 0;
-    padding: 16px;
-    background: var(--card);
-    border-radius: var(--radius);
+    display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+    margin: 20px 0; padding: 16px;
+    background: var(--card); border-radius: var(--radius);
     border: 1px solid var(--border);
   }
-  .toolbar .filename {
-    flex: 1;
-    min-width: 200px;
-    font-weight: 500;
-  }
+  .toolbar .filename { flex: 1; min-width: 200px; font-weight: 500; }
   button {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-size: .95rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background .2s;
+    background: var(--primary); color: white; border: none;
+    padding: 10px 18px; border-radius: 8px; font-size: .95rem;
+    font-weight: 500; cursor: pointer; transition: background .2s;
   }
   button:hover:not(:disabled) { background: var(--primary-hover); }
   button:disabled { opacity: .5; cursor: not-allowed; }
-  button.secondary {
-    background: transparent;
-    color: var(--text);
-    border: 1px solid var(--border);
-  }
-  button.secondary:hover:not(:disabled) {
-    background: var(--bg);
-  }
-
-  .progress-wrap {
-    display: none;
-    margin: 16px 0;
-  }
+  button.secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  button.secondary:hover:not(:disabled) { background: var(--bg); }
+  .progress-wrap { display: none; margin: 16px 0; }
   .progress-wrap.active { display: block; }
-  .progress-bar {
-    height: 8px;
-    background: var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    width: 0%;
-    background: var(--primary);
-    transition: width .3s ease;
-  }
-  .progress-text {
-    font-size: .85rem;
-    color: var(--muted);
-    margin-top: 6px;
-    text-align: center;
-  }
-
+  .progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; background: var(--primary); transition: width .3s ease; }
+  .progress-text { font-size: .85rem; color: var(--muted); margin-top: 6px; text-align: center; }
   .preview {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 40px;
-    min-height: 400px;
-    margin-top: 16px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 40px;
+    min-height: 400px; margin-top: 16px;
     box-shadow: 0 1px 3px rgba(0,0,0,.05);
   }
   .preview:empty::before {
     content: "La prévisualisation apparaîtra ici…";
-    color: var(--muted);
-    font-style: italic;
+    color: var(--muted); font-style: italic;
   }
-  .preview img { max-width: 100%; height: auto; }
-  .preview table { border-collapse: collapse; width: 100%; }
-  .preview td, .preview th {
-    border: 1px solid var(--border);
-    padding: 6px 10px;
-  }
-  .preview h1, .preview h2, .preview h3 { margin-top: 1.2em; }
-
-  .status {
-    margin-top: 12px;
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-size: .9rem;
-    display: none;
-  }
+  .status { margin-top: 12px; padding: 10px 14px; border-radius: 8px; font-size: .9rem; display: none; }
   .status.active { display: block; }
   .status.success { background: color-mix(in srgb, var(--success) 15%, transparent); color: var(--success); }
   .status.error { background: color-mix(in srgb, var(--danger) 15%, transparent); color: var(--danger); }
+  .status.warning { background: color-mix(in srgb, var(--warning) 15%, transparent); color: var(--warning); }
+  .options { display: flex; gap: 20px; align-items: center; margin-top: 8px; font-size: .9rem; color: var(--muted); flex-wrap: wrap; }
+  .options label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .options input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+  .options select { padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); color: var(--text); }
+  .mode-indicator { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; }
+  .mode-local { background: color-mix(in srgb, var(--success) 20%, transparent); color: var(--success); }
+  .mode-libreoffice { background: color-mix(in srgb, var(--primary) 20%, transparent); color: var(--primary); }
+  .warning-box {
+    background: color-mix(in srgb, var(--warning) 10%, transparent);
+    border: 1px solid var(--warning); border-radius: 8px;
+    padding: 12px 16px; margin-top: 12px; font-size: 0.9rem; display: none;
+  }
+  .warning-box.active { display: block; }
+  .warning-box strong { color: var(--warning); }
 
-  .options {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    margin-top: 8px;
-    font-size: .9rem;
-    color: var(--muted);
+  /* Styles de contenu PDF - fidèles à Word */
+  .pdf-content {
+    font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+    font-size: 11pt; line-height: 1.5; color: #000; background: #fff;
+    padding: 20mm; max-width: 210mm; margin: 0 auto;
   }
-  .options label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .options select, .options input[type="number"] {
-    padding: 4px 8px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--card);
-    color: var(--text);
+  .pdf-content h1 { font-size: 18pt; color: #1f4e79; border-bottom: 2px solid #1f4e79; padding-bottom: 6pt; margin-top: 24pt; margin-bottom: 12pt; }
+  .pdf-content h2 { font-size: 14pt; color: #2e75b6; margin-top: 18pt; margin-bottom: 9pt; }
+  .pdf-content h3 { font-size: 12pt; color: #404040; margin-top: 14pt; margin-bottom: 7pt; }
+  .pdf-content p { margin: 0 0 9pt 0; }
+  .pdf-content strong, .pdf-content b { font-weight: bold; }
+  .pdf-content em, .pdf-content i { font-style: italic; }
+  .pdf-content u { text-decoration: underline; }
+  .pdf-content s { text-decoration: line-through; }
+  .pdf-content sup { font-size: 0.75em; vertical-align: super; }
+  .pdf-content sub { font-size: 0.75em; vertical-align: sub; }
+  .pdf-content .highlight-yellow { background-color: #ffff00; padding: 2pt 4pt; }
+  .pdf-content .text-red { color: #ff0000; }
+  .pdf-content .text-green { color: #00ff00; }
+  .pdf-content .text-blue { color: #0000ff; }
+  .pdf-content .text-box { border: 1pt solid #000; padding: 4pt 8pt; display: inline-block; }
+  .pdf-content .text-inverse { background: #000; color: #fff; padding: 2pt 6pt; }
+  .pdf-content .paragraph-right { text-align: right; border-right: 3pt solid #ccc; background: #f0f0f0; padding: 8pt; margin: 9pt 0; }
+  .pdf-content .paragraph-hanging { text-indent: -20pt; padding-left: 20pt; margin-top: 12pt; }
+  .pdf-content table { border-collapse: collapse; width: 100%; margin: 12pt 0; }
+  .pdf-content table th, .pdf-content table td { border: 1pt solid #000; padding: 4pt 8pt; text-align: left; }
+  .pdf-content table th { background: #d9e2f3; font-weight: bold; }
+  .pdf-content ul, .pdf-content ol { margin: 9pt 0; padding-left: 30pt; }
+  .pdf-content li { margin: 3pt 0; }
+  .pdf-content img { max-width: 100%; height: auto; }
+  .pdf-content a { color: #0563c1; text-decoration: underline; }
+
+  /* Conteneur de capture PDF - hauteur fixe A4 */
+  .pdf-page-capture {
+    width: 794px;
+    min-height: 1123px;
+    background: white;
+    color: black;
+    padding: 75px;
+    box-sizing: border-box;
+    font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
   }
 </style>
 </head>
 <body>
 <div class="container">
   <h1>📄 Convertisseur DOCX → PDF</h1>
-  <p class="subtitle">Tout se passe localement dans votre navigateur. Aucun fichier n'est envoyé sur Internet.</p>
+  <p class="subtitle">Conversion locale ou avec LibreOffice pour une fidélité maximale</p>
 
   <label for="fileInput" class="dropzone" id="dropzone">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,12 +173,19 @@
         d="M7 16a4 4 0 01-.88-7.9A5 5 0 0115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
     </svg>
     <p><strong>Cliquez ou glissez un fichier .docx ici</strong></p>
-    <p class="hint">Le traitement est entièrement local</p>
+    <p class="hint">Le traitement peut être entièrement local ou via LibreOffice</p>
     <input type="file" id="fileInput" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
   </label>
 
   <div class="toolbar" id="toolbar" style="display:none;">
     <span class="filename" id="filename"></span>
+    <div class="options">
+      <label>
+        <input type="checkbox" id="libreofficeCheck">
+        <span>Mode LibreOffice (fidèle)</span>
+      </label>
+      <span class="mode-indicator mode-local" id="modeIndicator">🔒 Mode Local</span>
+    </div>
     <div class="options">
       <label>Qualité :
         <select id="qualitySelect">
@@ -224,7 +196,13 @@
       </label>
     </div>
     <button class="secondary" id="resetBtn">Nouveau fichier</button>
-    <button id="downloadBtn"> Télécharger en PDF</button>
+    <button id="downloadBtn">⬇ Télécharger en PDF</button>
+  </div>
+
+  <div class="warning-box" id="warningBox">
+    <strong>⚠️ Attention :</strong> Le mode LibreOffice nécessite un serveur backend (Python/Flask).
+    Si le serveur n'est pas disponible, la conversion basculera automatiquement en mode local.
+    <br><small>URL attendue : <code>http://localhost:5000</code></small>
   </div>
 
   <div class="progress-wrap" id="progressWrap">
@@ -252,9 +230,15 @@ const progressFill = document.getElementById('progressFill');
 const progressText = document.getElementById('progressText');
 const statusEl = document.getElementById('status');
 const qualitySelect = document.getElementById('qualitySelect');
+const libreofficeCheck = document.getElementById('libreofficeCheck');
+const warningBox = document.getElementById('warningBox');
+const modeIndicator = document.getElementById('modeIndicator');
 
+let currentFile = null;
 let currentHtml = '';
 let currentName = '';
+
+const LIBREOFFICE_SERVER = 'http://localhost:5000';
 
 function showStatus(msg, type) {
   statusEl.textContent = msg;
@@ -269,7 +253,20 @@ function setProgress(pct, text) {
 }
 function hideProgress() { progressWrap.classList.remove('active'); }
 
-// Drag & drop
+libreofficeCheck.addEventListener('change', () => {
+  if (libreofficeCheck.checked) {
+    warningBox.classList.add('active');
+    modeIndicator.textContent = '🖥️ Mode LibreOffice';
+    modeIndicator.className = 'mode-indicator mode-libreoffice';
+    showStatus('ℹ️ Mode LibreOffice activé - Fallback automatique si serveur indisponible', 'warning');
+  } else {
+    warningBox.classList.remove('active');
+    modeIndicator.textContent = '🔒 Mode Local';
+    modeIndicator.className = 'mode-indicator mode-local';
+    hideStatus();
+  }
+});
+
 ['dragenter', 'dragover'].forEach(evt =>
   dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.add('dragover'); })
 );
@@ -290,16 +287,18 @@ async function handleFile(file) {
     showStatus('❌ Veuillez sélectionner un fichier .docx', 'error');
     return;
   }
+  currentFile = file;
   currentName = file.name.replace(/\.docx$/i, '');
-  filenameEl.textContent = ' ' + file.name;
-  setProgress(10, 'Lecture du fichier…');
+  filenameEl.textContent = '📎 ' + file.name;
 
+  setProgress(10, 'Lecture du fichier…');
   try {
     const arrayBuffer = await file.arrayBuffer();
     setProgress(40, 'Conversion en HTML…');
     const result = await mammoth.convertToHtml(
       { arrayBuffer },
-      { convertImage: mammoth.images.imgElement(function(image) {
+      {
+        convertImage: mammoth.images.imgElement(function(image) {
           return image.read("base64").then(function(imgBase64) {
             return { src: "data:" + image.contentType + ";base64," + imgBase64 };
           });
@@ -307,184 +306,178 @@ async function handleFile(file) {
       }
     );
     currentHtml = result.value;
-    preview.innerHTML = currentHtml;
+    preview.innerHTML = '<div class="pdf-content">' + currentHtml + '</div>';
     setProgress(100, 'Prévisualisation prête ✓');
     setTimeout(hideProgress, 800);
     toolbar.style.display = 'flex';
-    if (result.messages.length) {
-      console.warn('Avertissements mammoth :', result.messages);
+    showStatus('✅ Fichier chargé et prévisualisé', 'success');
+  } catch (err) {
+    console.error(err);
+    hideProgress();
+    showStatus('❌ Erreur : ' + err.message, 'error');
+  }
+}
+
+// Découpe le HTML en pages A4 (794x1123px)
+function splitIntoPages(htmlContent) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlContent, 'text/html');
+  const children = Array.from(doc.body.children);
+
+  const pages = [];
+  let currentPage = document.createElement('div');
+  currentPage.className = 'pdf-page-capture';
+  let currentHeight = 0;
+  const maxHeight = 973; // 1123 - 150 (padding)
+
+  for (const child of children) {
+    // Mesurer la hauteur réelle de l'élément
+    const tempDiv = document.createElement('div');
+    tempDiv.style.cssText = 'position:absolute;visibility:hidden;width:644px;top:-9999px;left:-9999px;';
+    tempDiv.appendChild(child.cloneNode(true));
+    document.body.appendChild(tempDiv);
+    const childHeight = tempDiv.offsetHeight;
+    document.body.removeChild(tempDiv);
+
+    if (currentHeight + childHeight > maxHeight && currentHeight > 0) {
+      pages.push(currentPage);
+      currentPage = document.createElement('div');
+      currentPage.className = 'pdf-page-capture';
+      currentHeight = 0;
+    }
+
+    currentPage.appendChild(child.cloneNode(true));
+    currentHeight += childHeight;
+  }
+
+  if (currentPage.children.length > 0) {
+    pages.push(currentPage);
+  }
+
+  return pages;
+}
+
+async function convertLocally() {
+  if (!currentHtml) throw new Error('Aucun contenu à convertir');
+
+  const scale = parseFloat(qualitySelect.value);
+  const pages = splitIntoPages(currentHtml);
+
+  const pdf = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+    compress: true
+  });
+
+  const pdfWidth = 210;
+  const pdfHeight = 297;
+  const margin = 10;
+  const contentWidth = pdfWidth - (margin * 2);
+  const contentHeight = pdfHeight - (margin * 2);
+
+  for (let i = 0; i < pages.length; i++) {
+    const page = pages[i];
+    document.body.appendChild(page);
+
+    setProgress(10 + (80 * (i + 1) / pages.length),
+      `Rendu de la page ${i + 1}/${pages.length}…`);
+
+    await new Promise(resolve => setTimeout(resolve, 400));
+
+    const canvas = await html2canvas(page, {
+      scale: scale,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+      width: 794,
+      windowWidth: 794
+    });
+
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+    if (i > 0) pdf.addPage();
+    pdf.addImage(imgData, 'JPEG', margin, margin, contentWidth, contentHeight);
+
+    document.body.removeChild(page);
+  }
+
+  return pdf;
+}
+
+async function convertWithLibreOffice(file) {
+  setProgress(0, 'Tentative de connexion au serveur LibreOffice…');
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    const response = await fetch(LIBREOFFICE_SERVER + '/convert', {
+      method: 'POST',
+      body: formData,
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) throw new Error('Erreur serveur: ' + response.status);
+
+    setProgress(50, 'Conversion en cours sur le serveur…');
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = currentName + '.pdf';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+
+    return true;
+  } catch (err) {
+    console.warn('Serveur LibreOffice indisponible:', err);
+    return false;
+  }
+}
+
+downloadBtn.addEventListener('click', async () => {
+  downloadBtn.disabled = true;
+
+  try {
+    if (libreofficeCheck.checked) {
+      const success = await convertWithLibreOffice(currentFile);
+
+      if (success) {
+        setProgress(100, 'PDF généré avec LibreOffice ✓');
+        setTimeout(hideProgress, 1000);
+        showStatus('✅ PDF téléchargé via LibreOffice : ' + currentName + '.pdf', 'success');
+      } else {
+        showStatus('️ Serveur LibreOffice indisponible, bascule en mode local…', 'warning');
+        setProgress(0, 'Conversion en mode local…');
+        const pdf = await convertLocally();
+        setProgress(95, 'Sauvegarde…');
+        pdf.save(currentName + '.pdf');
+        setProgress(100, 'PDF généré ✓');
+        setTimeout(hideProgress, 1000);
+        showStatus('✅ PDF téléchargé (mode local) : ' + currentName + '.pdf', 'success');
+      }
+    } else {
+      setProgress(0, 'Génération du PDF…');
+      const pdf = await convertLocally();
+      setProgress(95, 'Sauvegarde…');
+      pdf.save(currentName + '.pdf');
+      setProgress(100, 'PDF généré ✓');
+      setTimeout(hideProgress, 1000);
+      showStatus('✅ PDF téléchargé : ' + currentName + '.pdf', 'success');
     }
   } catch (err) {
     console.error(err);
     hideProgress();
-    showStatus('❌ Erreur lors de la lecture : ' + err.message, 'error');
-  }
-}
-
-// Attendre le chargement de toutes les images
-async function waitForImages(element) {
-  const images = element.getElementsByTagName('img');
-  const promises = [];
-  for (let img of images) {
-    if (!img.complete) {
-      promises.push(new Promise((resolve) => {
-        img.addEventListener('load', resolve);
-        img.addEventListener('error', resolve);
-      }));
-    }
-  }
-  await Promise.all(promises);
-}
-
-// Découper le contenu en "pages" logiques pour éviter le dépassement de canvas
-function splitIntoPages(container, maxHeight) {
-  const children = Array.from(container.children);
-  const pages = [];
-  let currentPage = document.createElement('div');
-  currentPage.style.cssText = container.style.cssText;
-  let currentHeight = 0;
-
-  for (const child of children) {
-    const childHeight = child.offsetHeight;
-    
-    // Si l'élément seul dépasse la hauteur max, on le met dans une page dédiée
-    if (childHeight > maxHeight && pages.length === 0 && currentHeight === 0) {
-      // Élément très grand (ex: tableau), on le laisse tel quel
-      currentPage.appendChild(child.cloneNode(true));
-      pages.push(currentPage);
-      currentPage = document.createElement('div');
-      currentPage.style.cssText = container.style.cssText;
-      currentHeight = 0;
-      continue;
-    }
-    
-    if (currentHeight + childHeight > maxHeight && currentHeight > 0) {
-      pages.push(currentPage);
-      currentPage = document.createElement('div');
-      currentPage.style.cssText = container.style.cssText;
-      currentHeight = 0;
-    }
-    
-    currentPage.appendChild(child.cloneNode(true));
-    currentHeight += childHeight;
-  }
-  
-  if (currentPage.children.length > 0) {
-    pages.push(currentPage);
-  }
-  
-  return pages;
-}
-
-downloadBtn.addEventListener('click', async () => {
-  if (!currentHtml || preview.innerHTML.trim() === '') {
-    showStatus('❌ Aucun contenu à convertir', 'error');
-    return;
-  }
-  
-  downloadBtn.disabled = true;
-  setProgress(0, 'Préparation du PDF…');
-
-  try {
-    const scale = parseFloat(qualitySelect.value);
-    
-    // Créer un conteneur temporaire pour le rendu PDF
-    const pdfContainer = document.createElement('div');
-    pdfContainer.innerHTML = currentHtml;
-    pdfContainer.style.cssText = `
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 794px;
-      padding: 40px;
-      background: white;
-      color: black;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      font-size: 11pt;
-      line-height: 1.5;
-      z-index: -1;
-      visibility: hidden;
-    `;
-    document.body.appendChild(pdfContainer);
-    
-    setProgress(10, 'Chargement des images…');
-    await waitForImages(pdfContainer);
-    
-    setProgress(20, 'Calcul de la pagination…');
-    
-    // Hauteur max par page en pixels (A4 = 297mm, à 96dpi = 1123px, moins les marges)
-    const pageHeightPx = 1000; // ~265mm
-    const pages = splitIntoPages(pdfContainer, pageHeightPx);
-    
-    setProgress(30, `Génération de ${pages.length} page(s)…`);
-    
-    // Créer le PDF
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4',
-      compress: true
-    });
-    
-    const pdfWidth = 210; // mm
-    const pdfHeight = 297; // mm
-    const margin = 10; // mm
-    const contentWidth = pdfWidth - (margin * 2);
-    const contentHeight = pdfHeight - (margin * 2);
-    
-    for (let i = 0; i < pages.length; i++) {
-      const page = pages[i];
-      document.body.appendChild(page);
-      
-      setProgress(30 + (60 * (i + 1) / pages.length), `Rendu de la page ${i + 1}/${pages.length}…`);
-      
-      // Capturer la page en canvas
-      const canvas = await html2canvas(page, {
-        scale: scale,
-        useCORS: true,
-        logging: false,
-        letterRendering: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        width: 794,
-        windowWidth: 794
-      });
-      
-      // Convertir en image
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      
-      // Calculer les dimensions pour fitting
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(contentWidth / imgWidth, contentHeight / imgHeight);
-      const finalWidth = imgWidth * ratio;
-      const finalHeight = imgHeight * ratio;
-      
-      // Centrer sur la page
-      const x = (pdfWidth - finalWidth) / 2;
-      const y = (pdfHeight - finalHeight) / 2;
-      
-      if (i > 0) {
-        pdf.addPage();
-      }
-      pdf.addImage(imgData, 'JPEG', x, y, finalWidth, finalHeight);
-      
-      document.body.removeChild(page);
-    }
-    
-    document.body.removeChild(pdfContainer);
-    
-    setProgress(95, 'Sauvegarde du PDF…');
-    pdf.save(currentName + '.pdf');
-    
-    setProgress(100, 'PDF généré avec succès ✓');
-    setTimeout(hideProgress, 1000);
-    showStatus(`✅ PDF téléchargé : ${currentName}.pdf (${pages.length} page(s))`, 'success');
-    
-  } catch (err) {
-    console.error('Erreur PDF:', err);
-    hideProgress();
-    showStatus('❌ Erreur lors de la génération : ' + err.message, 'error');
+    showStatus('❌ ' + err.message, 'error');
   } finally {
     downloadBtn.disabled = false;
   }
@@ -494,6 +487,7 @@ resetBtn.addEventListener('click', () => {
   preview.innerHTML = '';
   toolbar.style.display = 'none';
   fileInput.value = '';
+  currentFile = null;
   currentHtml = '';
   currentName = '';
   hideStatus();
